@@ -36,13 +36,13 @@ void demoBufferOverflowData() {
 	printf("login as: ");
 	fflush(stdout);
 	//gets(userName); // use scanf("%s", userName); if gets fails with identifier not found
-	scanf("%s", userName);
+	fgets(userName, USER_INPUT_MAX_LENGTH - 1, stdin);
 
 	// Get password
 	printf("%s@vulnerable.machine.com: ", userName);
 	fflush(stdout);
 	//gets(passwd);  
-	scanf("%s", passwd); // use scanf("%s", passwd); if gets fails with identifier not found
+	fgets(passwd, USER_INPUT_MAX_LENGTH - 1, stdin); // use scanf("%s", passwd); if gets fails with identifier not found
 
 	// Check user rights (set to NORMAL_USER and not changed in code)
 	if (userRights == NORMAL_USER) {
@@ -111,10 +111,15 @@ void demoDataTypeOverflow(int totalItemsCount, some_structure* pItem, int itemPo
 	printf("Bytes to allocation: %d\n", bytesToAllocation);
 	data_copy = (some_structure*)malloc(bytesToAllocation);
 	if (itemPosition >= 0 && itemPosition < totalItemsCount) {
+		if (sizeof(pItem->someData) / sizeof(*pItem->someData) > 1000) {
+			free(data_copy);
+			return;
+		}
 		memcpy(&(data_copy[itemPosition]), pItem, sizeof(some_structure));
 	}
 	else {
 		printf("Out of bound assignment");
+		free(data_copy);
 		return;
 	}
 	free(data_copy);
